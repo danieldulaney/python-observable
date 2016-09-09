@@ -1,0 +1,9 @@
+language: python
+python:
+  - 3.2
+  - 3.3
+  - 3.4
+  - 3.5
+  - "nightly"
+ 
+script: python -m unittest discover --start-directory observables/tests --top-level-directory observables
