@@ -6,4 +6,4 @@ python:
   - 3.5
   - "nightly"
  
-#script: python -m unittest tests
+script: python -m unittest discover --start-directory observables/tests
