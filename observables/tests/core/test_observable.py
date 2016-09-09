@@ -2,7 +2,7 @@ import unittest
 import core.observable
 
 
-class Test(unittest.TestCase):
+class TestObservable(unittest.TestCase):
 
     def testName(self):
         pass
