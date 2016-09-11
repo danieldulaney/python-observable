@@ -1,7 +1,15 @@
 class Observable(object):
 
-    def __init__(self):
+    def __init__(self, *watchers):
+        '''
+        Initialize the observable, optionally with one or more
+        watchers.
+
+        :param *watchers: One or more 2-tuples, each containing
+            callback functions for update and complete
+        '''
         self.__ensure_properties()
+        self.watch(*watchers)
 
     def watch(self, *watchers):
         '''
