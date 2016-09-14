@@ -1,4 +1,8 @@
-class Observable(object):
+from core.observer import Observer
+from collections import Iterable
+
+
+class Observable:
 
     def __init__(self, *watchers):
         '''
@@ -8,6 +12,7 @@ class Observable(object):
         :param *watchers: One or more 2-tuples, each containing
             callback functions for update and complete
         '''
+
         self.__ensure_properties()
         self.watch(*watchers)
 
@@ -58,9 +63,16 @@ class Observable(object):
         '''
 
         for watcher in self.__watchers:
-            watcher[1]()
+            if callable(watcher[1]):
+                watcher[1]()
 
     def __ensure_properties(self):
+        '''
+        Ensures that the __watchers and __finished parameters exist.
+
+        If not, it initializes __watchers as an empty set and
+        __finished as False.
+        '''
         if not hasattr(self, "__watchers"):
             self.__watchers = set()
 
@@ -74,17 +86,32 @@ class Observable(object):
 
         :param raw_watchers: The watcher list from a *watchers
             parameter
-        :type raw_watchers: N-tuple
+        :type raw_watchers: N-tuple of Observers, iterators returning
+            callables, or callables
         '''
 
         nice_watchers = set()
 
         for raw_watcher in raw_watchers:
-            update = raw_watcher[0]
-            try:
-                finish = raw_watcher[1]
-            except IndexError:
+            print("Parsing watcher: " + repr(raw_watcher))
+            print("The watcher is an observer: " +
+                  str(isinstance(raw_watcher, Observer)))
+            if isinstance(raw_watcher, Observer):
+                print("Got Observer: " + repr(raw_watcher))
+                update = raw_watcher.update
+                finish = raw_watcher.finish
+            elif isinstance(raw_watcher, Iterable) and len(raw_watcher) >= 1 and callable(raw_watcher[0]):
+                update = raw_watcher[0]
+                if len(raw_watcher) >= 2:
+                    finish = raw_watcher[1]
+                else:
+                    finish = None
+            elif callable(raw_watcher):
+                update = raw_watcher
                 finish = None
+            else:
+                raise TypeError(
+                    "Watcher must be an Observer, an iterator returning callables, or a callable")
 
             nice_watchers.add((update, finish))
 
